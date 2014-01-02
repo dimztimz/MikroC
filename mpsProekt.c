@@ -33,9 +33,52 @@ void interrupt() {
 
 
 void main() {
+     unsigned char prethodenZnak = '\0';
+     unsigned char tekovenZnak = '\0';
+     unsigned char text[40];
+     int i = 0;
+
      ANSEL = 0;
      ANSELH = 0;
+     C1ON_bit = 0;
+     C2ON_bit = 0;
      
+     Lcd_Init();
+     Keypad_Init();
+     UART1_Init(9600);
 
-
+     do {
+        prethodenZnak = tekovenZnak;
+        do {
+           tekovenZnak = Keypad_Key_Click();
+        } while (tekovenZnak == 0);
+        if (tekovenZnak >= 1 && tekovenZnak <=12) {
+           if (prethodenZnak >= 1 && prethodenZnak <=12) {
+              text[i++] = keypadToLetter[prethodenZnak-1][0];
+           }
+        } else if (tekovenZnak == 13) {
+           if (prethodenZnak >= 1 && prethodenZnak <=12) {
+              text[i++] = keypadToLetter[prethodenZnak-1][1];
+           }
+        } else if (tekovenZnak == 14) {
+           if (prethodenZnak >= 1 && prethodenZnak <=12) {
+              text[i++] = keypadToLetter[prethodenZnak-1][2];
+           }
+        } else if (tekovenZnak == 15) {
+           if (prethodenZnak >= 1 && prethodenZnak <=12) {
+              text[i++] = keypadToLetter[prethodenZnak-1][0];
+           }
+           text[i++] = ' ';
+        }  else if (tekovenZnak == 16) {
+           if (prethodenZnak >= 1 && prethodenZnak <=12) {
+              text[i++] = keypadToLetter[prethodenZnak-1][0];
+           }
+           text[i++] = '\0';
+           Lcd_Cmd(_LCD_CLEAR);
+           Lcd_Out_CP(text);
+        }
+        
+        
+        
+     } while (prethodenZnak == 15 && tekovenZnak == 15);
 }

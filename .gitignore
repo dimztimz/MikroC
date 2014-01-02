@@ -3,7 +3,6 @@
 *.ko
 *.obj
 *.elf
-*.mcl
 
 # Libraries
 *.lib
@@ -27,3 +26,10 @@
 *.ini
 *.log
 *.dct
+*.asm
+*.dbg
+*.dlt
+*.lst
+*.txt
+*.mcl
+*.cp
