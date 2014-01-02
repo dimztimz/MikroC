@@ -1,5 +1,5 @@
 
-unsigned char keypadPort at PORTD;
+char keypadPort at PORTD;
 
 // Start LCD module connections
 sbit LCD_RS at RB4_bit;
@@ -16,12 +16,13 @@ sbit LCD_D6_Direction at TRISB2_bit;
 sbit LCD_D7_Direction at TRISB3_bit;
 
 char keypadToLetter[][4] = {
-"AMY", "DPY", "GS4", "JV7",
+"AMY", "DP1", "GS4", "JV7",
 "BNZ", "EQ2", "HT5", "KW8",
 "CO0", "FR3", "IU6", "LX9"
 };
 
 unsigned int cnt;
+unsigned char * textVnesiPoraka = "Vnesi poraka!";
 
 void interrupt() {
      if (TMR0IF_bit) {
@@ -31,54 +32,91 @@ void interrupt() {
      }
 }
 
-
 void main() {
      unsigned char prethodenZnak = '\0';
      unsigned char tekovenZnak = '\0';
-     unsigned char text[40];
-     int i = 0;
+     unsigned char text[40], brojStr[7];
+     int i = 0, brZborovi = 0;
 
      ANSEL = 0;
      ANSELH = 0;
      C1ON_bit = 0;
      C2ON_bit = 0;
+     OPTION_REG = 0x83;
      
      Lcd_Init();
      Keypad_Init();
      UART1_Init(9600);
 
+     Lcd_Cmd(_LCD_CLEAR);
+     Lcd_Out_CP(textVnesiPoraka);
+     Lcd_Cmd(_LCD_SECOND_ROW);
+
      do {
-        prethodenZnak = tekovenZnak;
+     	prethodenZnak = tekovenZnak;
         do {
            tekovenZnak = Keypad_Key_Click();
         } while (tekovenZnak == 0);
+        //IntToStr(tekovenZnak, brojStr);
+        //Lcd_Out(2, 1, brojStr);
         if (tekovenZnak >= 1 && tekovenZnak <=12) {
            if (prethodenZnak >= 1 && prethodenZnak <=12) {
               text[i++] = keypadToLetter[prethodenZnak-1][0];
+              Lcd_Chr_CP(text[i-1]);
+           } else if (prethodenZnak < 1 || prethodenZnak > 14) {
+              brZborovi++;
            }
         } else if (tekovenZnak == 13) {
            if (prethodenZnak >= 1 && prethodenZnak <=12) {
               text[i++] = keypadToLetter[prethodenZnak-1][1];
+              Lcd_Chr_CP(text[i-1]);
            }
         } else if (tekovenZnak == 14) {
            if (prethodenZnak >= 1 && prethodenZnak <=12) {
               text[i++] = keypadToLetter[prethodenZnak-1][2];
+              Lcd_Chr_CP(text[i-1]);
            }
         } else if (tekovenZnak == 15) {
            if (prethodenZnak >= 1 && prethodenZnak <=12) {
               text[i++] = keypadToLetter[prethodenZnak-1][0];
+              Lcd_Chr_CP(text[i-1]);
            }
            text[i++] = ' ';
-        }  else if (tekovenZnak == 16) {
+           Lcd_Chr_CP(text[i-1]);
+           UART1_Write(' ');
+        } else if (tekovenZnak == 16) {
+           unsigned char * brojStrPocetok;
+        
            if (prethodenZnak >= 1 && prethodenZnak <=12) {
               text[i++] = keypadToLetter[prethodenZnak-1][0];
+              Lcd_Chr_CP(text[i-1]);
            }
-           text[i++] = '\0';
+           text[i] = '\0';
            Lcd_Cmd(_LCD_CLEAR);
            Lcd_Out_CP(text);
+           Lcd_Cmd(_LCD_SECOND_ROW);
+           
+           //bezvezi operaii so nizi od znaci zasto sprintfi() pravi Demo Limit.
+           IntToStr(brZborovi, brojStr);
+           brojStrPocetok = brojStr;
+           while (*brojStrPocetok != '\0' && *brojStrPocetok == ' ') {
+                 brojStrPocetok++;
+           }
+           strcpy(text, "Ima ");
+           strcat(text, brojStrPocetok);
+           strcat(text, " zborovi.");
+           Lcd_Out_CP(text);
+           INTCON = 0xA0;
+           cnt = 0;
+           TMR0 = 131;
+           while (cnt < 20);
+           INTCON = 0;
+
+           i = 0;
+           brZborovi = 0;
+           Lcd_Cmd(_LCD_CLEAR);
+           Lcd_Out_CP(textVnesiPoraka);
+           Lcd_Cmd(_LCD_SECOND_ROW);
         }
-        
-        
-        
-     } while (prethodenZnak == 15 && tekovenZnak == 15);
+     } while (prethodenZnak != 15 || tekovenZnak != 15);
 }

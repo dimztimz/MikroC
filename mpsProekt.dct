@@ -1400,6 +1400,7 @@ t6963c_writecommand
 t6963c_writedata
 tan
 tanh
+textvnesiporaka
 time_datetoepoch
 time_epochtodate
 time_jd1970
