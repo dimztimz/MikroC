@@ -1,4 +1,6 @@
-
+/*Proekt broj 6 po Mikroprocesorski sitemi
+student: Dimitrij Mijoski, indeks: 111132
+*/
 char keypadPort at PORTD;
 
 // Start LCD module connections
@@ -110,7 +112,6 @@ void main() {
                   cestotaNaBukvi[text[j]-'A']++;
                }
            }
-           //bezvezi operaii so nizi od znaci zasto sprintfi() pravi Demo Limit.
            brojStrPocetok = IntToStrBezPrazniMesta(brZborovi, brojStr);
            strcpy(text, "Ima ");
            strcat(text, brojStrPocetok);
