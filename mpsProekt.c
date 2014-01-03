@@ -23,6 +23,7 @@ char keypadToLetter[][4] = {
 
 unsigned int cnt;
 unsigned char * textVnesiPoraka = "Vnesi poraka!";
+unsigned char cestotaNaBukvi[26];
 
 void interrupt() {
      if (TMR0IF_bit) {
@@ -30,6 +31,14 @@ void interrupt() {
         cnt++;
         TMR0IF_bit = 0;
      }
+}
+
+unsigned char * IntToStrBezPrazniMesta(int a, unsigned char * outStr) {
+         IntToStr(a, outStr);
+         while (*outStr != '\0' && *outStr == ' ') {
+               outStr++;
+         }
+         return outStr;
 }
 
 void main() {
@@ -53,12 +62,11 @@ void main() {
      Lcd_Cmd(_LCD_SECOND_ROW);
 
      do {
-     	prethodenZnak = tekovenZnak;
+        prethodenZnak = tekovenZnak;
         do {
            tekovenZnak = Keypad_Key_Click();
         } while (tekovenZnak == 0);
-        //IntToStr(tekovenZnak, brojStr);
-        //Lcd_Out(2, 1, brojStr);
+        
         if (tekovenZnak >= 1 && tekovenZnak <=12) {
            if (prethodenZnak >= 1 && prethodenZnak <=12) {
               text[i++] = keypadToLetter[prethodenZnak-1][0];
@@ -86,6 +94,7 @@ void main() {
            UART1_Write(' ');
         } else if (tekovenZnak == 16) {
            unsigned char * brojStrPocetok;
+           int j;
         
            if (prethodenZnak >= 1 && prethodenZnak <=12) {
               text[i++] = keypadToLetter[prethodenZnak-1][0];
@@ -96,16 +105,28 @@ void main() {
            Lcd_Out_CP(text);
            Lcd_Cmd(_LCD_SECOND_ROW);
            
-           //bezvezi operaii so nizi od znaci zasto sprintfi() pravi Demo Limit.
-           IntToStr(brZborovi, brojStr);
-           brojStrPocetok = brojStr;
-           while (*brojStrPocetok != '\0' && *brojStrPocetok == ' ') {
-                 brojStrPocetok++;
+           for (j=0; j<i; j++) {
+               if (text[j] >= 'A' && text[j] <= 'Z') {
+                  cestotaNaBukvi[text[j]-'A']++;
+               }
            }
+           //bezvezi operaii so nizi od znaci zasto sprintfi() pravi Demo Limit.
+           brojStrPocetok = IntToStrBezPrazniMesta(brZborovi, brojStr);
            strcpy(text, "Ima ");
            strcat(text, brojStrPocetok);
            strcat(text, " zborovi.");
            Lcd_Out_CP(text);
+           
+           for (j=0; j<26; j++) {
+               if (cestotaNaBukvi[j] != 0) {
+                   brojStrPocetok = IntToStrBezPrazniMesta(cestotaNaBukvi[j], brojStr);
+                   UART1_Write(j+'A');
+                   UART1_Write(' ');
+                   UART1_Write_Text(brojStrPocetok);
+                   UART1_Write(' ');
+               }
+           }
+           
            INTCON = 0xA0;
            cnt = 0;
            TMR0 = 131;
@@ -114,6 +135,9 @@ void main() {
 
            i = 0;
            brZborovi = 0;
+           for (j=0; j<26; j++) {
+               cestotaNaBukvi[j] = 0;
+           }
            Lcd_Cmd(_LCD_CLEAR);
            Lcd_Out_CP(textVnesiPoraka);
            Lcd_Cmd(_LCD_SECOND_ROW);

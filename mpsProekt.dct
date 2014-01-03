@@ -384,6 +384,7 @@ ccpr2
 ccpr2h
 ccpr2l
 ceil
+cestotanabukvi
 cf_detect
 cf_disable
 cf_enable
@@ -606,6 +607,7 @@ intf
 intf_bit
 inttohex
 inttostr
+inttostrbezpraznimesta
 inttostrwithzeros
 iocb
 iocb0
