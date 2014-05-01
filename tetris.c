@@ -29,6 +29,30 @@ void CustomChar(char pos_row, char pos_char) {
 }
 
 int sostojba[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int sostojba2[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+unsigned char figura[] = {0,0,0,0};
+
+void orSostojbaFigura(int * inSostojba, unsigned char * fig, int * outSostojba,
+     int x, int y) {
+     int i, iFig, iGran;
+     for(i=0; i<16; i++) {
+              outSostojba[i] = inSostojba[i];
+     }
+     if (y < 0) {
+        i = 0;
+        iFig = -y;
+     } else {
+       i = y;
+       iFig = 0;
+     }
+     iGran = y + 4;
+     if (iGran > 16) {
+        iGran = 16;
+     }
+     for (; i<iGran; i++, iFig++) {
+         outSostojba[i] |= (int)fig[iFig] << x;
+     }
+}
 
 void prikaziSostojba(int * s) {
      unsigned char znak1[8];
@@ -64,14 +88,16 @@ void prikaziSostojba(int * s) {
 }
 
 void main() {
+     int y = 15;
+
      ANSEL = 0;
      ANSELH = 0;
      Lcd_Init();
      Lcd_Cmd(_LCD_CURSOR_OFF);
      sostojba[15] = 0b0000000000;
-     sostojba[14] = 0b0011000000;
-     sostojba[13] = 0b0010000000;
-     sostojba[12] = 0b0010000000;
+     sostojba[14] = 0b0000000000;
+     sostojba[13] = 0b0000000000;
+     sostojba[12] = 0b0000000000;
      sostojba[11] = 0b0000000000;
      sostojba[10] = 0b0000000000;
      sostojba[9]  = 0b0000000000;
@@ -84,5 +110,14 @@ void main() {
      sostojba[2]  = 0b0000011010;
      sostojba[1]  = 0b0100011011;
      sostojba[0]  = 0b1110111111;
-     prikaziSostojba(sostojba);
+     
+     figura[3] = 0b0000;
+     figura[2] = 0b0011;
+     figura[1] = 0b0010;
+     figura[0] = 0b0010;
+     
+     for (y = 3; y >= -3; y--) {
+         orSostojbaFigura(sostojba, figura, sostojba2, 6, y);
+         prikaziSostojba(sostojba2);
+     }
 }
