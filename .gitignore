@@ -36,3 +36,5 @@
 *.brk
 *.bmk
 *.dic
+*.cfg
+*.wch
