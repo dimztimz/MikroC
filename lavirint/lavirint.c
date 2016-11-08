@@ -84,7 +84,19 @@ void printCell(unsigned char cellModel)
   ++i;
 }
 
-unsigned char maze[8][8];
+#define MZ(x, y) ((x) | ((y) << 4))
+
+unsigned char maze[8][8] =
+{
+{MZ(9, 3), MZ(9, 5), MZ(5, 5), MZ(1, 2), MZ(9, 5), MZ(3, 9), MZ(3, 9), MZ(3, 11)},
+{MZ(10, 10), MZ(12, 1), MZ(5, 7), MZ(10, 12), MZ(6, 11), MZ(10, 10), MZ(12, 6), MZ(12, 2)},
+{MZ(14, 10), MZ(11, 10), MZ(9, 3), MZ(12, 3), MZ(9, 6), MZ(10, 10), MZ(9, 5), MZ(3, 10)},
+{MZ(9, 6), MZ(8, 6), MZ(10, 10), MZ(9, 6), MZ(12, 5), MZ(2, 14), MZ(12, 3), MZ(12, 6)},
+{MZ(10, 9), MZ(0, 5), MZ(6, 14), MZ(12, 5), MZ(3, 13), MZ(4, 3), MZ(9, 6), MZ(9, 3)},
+{MZ(12, 2), MZ(14, 9), MZ(3, 9), MZ(5, 3), MZ(10, 9), MZ(3, 10), MZ(12, 3), MZ(10, 10)},
+{MZ(9, 2), MZ(9, 6), MZ(10, 12), MZ(7, 10), MZ(10, 10), MZ(14, 8), MZ(1, 6), MZ(14, 10)},
+{MZ(14, 12), MZ(6, 13), MZ(4, 5), MZ(5, 6), MZ(10, 12), MZ(5, 6), MZ(12, 5), MZ(5, 6)}
+};
 
 void printMaze()
 {
@@ -94,8 +106,8 @@ void printMaze()
     Glcd_Set_Page(i);
     Glcd_Set_X(0);
     for(j = 0; j < 4; ++j) {
-      printCellWithPlayer(maze[i][j] & 0x0F);
-      printCellWithPlayer(SET_IGRAC((maze[i][j] & 0xF0) >> 4));
+      printCell(maze[i][j] & 0x0F);
+      printCell((maze[i][j] & 0xF0) >> 4);
     }
     Glcd_Set_Side(0);
     Glcd_Set_Page(i);
@@ -121,7 +133,7 @@ void main() {
   
   for (i = 0; i < 8; ++i) {
     for (j = 0; j < 8; ++j) {
-      maze[i][j] = rand();
+      //maze[i][j] = rand();
     }
   }
   printMaze();
