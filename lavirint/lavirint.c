@@ -165,14 +165,29 @@ void main() {
   i = 0;
   j = 7;
   cell = printCellAt(i, j, 1);
-  while (i != 7 || j != 7) {
+  while (i != 7 || j != 8) {
     unsigned char keyp = 0;
     do {
       keyp = Keypad_Key_Press();
     } while (keyp == 0);
-    if (keyp == 1 && DOLU(cell) == 0) {
+    if (keyp == 2 && !LEVO(cell) && j > 0) {
+      printCellAt(i,j, 0);
+      --j;
+      cell = printCellAt(i,j, 1);
+    }
+    else if (keyp == 5 && !GORE(cell) && i > 0) {
+      printCellAt(i,j, 0);
+      --i;
+      cell = printCellAt(i,j, 1);
+    }
+    else if (keyp == 7 && !DOLU(cell) && i < 7) {
       printCellAt(i,j, 0);
       ++i;
+      cell = printCellAt(i,j, 1);
+    }
+    else if (keyp == 10 && !DESNO(cell) && j < 15) {
+      printCellAt(i,j, 0);
+      ++j;
       cell = printCellAt(i,j, 1);
     }
   }
