@@ -33,10 +33,10 @@ Count=0
 [OTHER_FILES]
 Count=0
 [SEARCH_PATH]
-Count=3
-Path0=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\defs\
-Path1=C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\Uses\P16\
-Path2=D:\projects\mikroc\
+Count=6
+Path0=C:\Mikroelektronika\mikroC PRO for PIC\Defs\
+Path1=C:\Mikroelektronika\mikroC PRO for PIC\Uses\P16\
+Path2=H:\projects\MikroC\
 [HEADER_PATH]
 Count=0
 [HEADERS]
@@ -88,6 +88,5 @@ File39=Time
 File40=TouchPanel
 File41=Trigonometry
 File42=UART
-[EXPANDED NODES]
-Node1=Sources
-Count=1
+[EXPANDED_NODES]
+Count=0

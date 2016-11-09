@@ -15,6 +15,8 @@ sbit GLCD_RW_Direction at TRISB3_bit;
 sbit GLCD_EN_Direction at TRISB4_bit;
 sbit GLCD_RST_Direction at TRISB5_bit;
 
+char keypadPort at PORTC;
+
 #define GORE(x) (x & 1)
 #define DESNO(x) (x & 2)
 #define DOLU(x) (x & 4)
@@ -30,31 +32,29 @@ sbit GLCD_RST_Direction at TRISB5_bit;
 void printCellWithPlayer(unsigned char cellModel)
 {
   unsigned char vertLine = 0;
-  if (LEVO(cellModel)) {
-    vertLine = 0xFF;
-  }
   if (GORE(cellModel)) {
     vertLine |= 1;
   }
   if (DOLU(cellModel)) {
     vertLine |= 0x80;
   }
-  Glcd_Write_Data(vertLine); //1
-  vertLine &= 0x81; //unset middle six bytes
-  Glcd_Write_Data(vertLine); //2
-  Glcd_Write_Data(vertLine);
-  if (IGRAC(cellModel)) {
-    vertLine |= 0x18; //set two middle bits
+  if (LEVO(cellModel)) {
+    Glcd_Write_Data(0xFF); //1
+  } else {
+    Glcd_Write_Data(vertLine); //1
   }
-  Glcd_Write_Data(vertLine);
-  Glcd_Write_Data(vertLine);
-  vertLine &= 0b11100111; //unset two middle bits
-  Glcd_Write_Data(vertLine);
-  Glcd_Write_Data(vertLine);
+  Glcd_Write_Data(vertLine); //2
+  Glcd_Write_Data(vertLine); //3
+  vertLine |= 0x18; //set two middle bits
+  Glcd_Write_Data(vertLine);  //4
+  Glcd_Write_Data(vertLine);  //5
+  vertLine &= 0b11100111; //reset two middle bits
+  Glcd_Write_Data(vertLine);  //6
+  Glcd_Write_Data(vertLine);  //7
   if (DESNO(cellModel)) {
     vertLine = 0xFF;
   }
-  Glcd_Write_Data(vertLine);
+  Glcd_Write_Data(vertLine);  //8
 }
 
 void printCell(unsigned char cellModel)
@@ -119,12 +119,36 @@ void printMaze()
   }
 }
 
+unsigned char printCellAt(unsigned char i, unsigned char j, unsigned char igrac)
+{
+  unsigned char x, side, cell;
+  x = (j&7) << 3;
+  if (j < 8) {
+    Glcd_Set_Side(64);
+  } else {
+    Glcd_Set_Side(0);
+  }
+  Glcd_Set_Page(i);
+  Glcd_Set_X(x);
+  cell = maze[i][j>>1];
+  if (j&1) {
+    cell = (cell & 0xF0) >> 4;
+  }
+  if (igrac) {
+    printCellWithPlayer(cell);
+  } else {
+    printCell(cell);
+  }
+  return cell;
+}
+
 void main() {
-  unsigned i, j;
-  ANSEL  = 0;                                      // Configure AN pins as digital
+  unsigned i, j, i2, j2, cell;
+  Keypad_Init();
+  ANSEL  = 0;                              // Configure AN pins as digital
   ANSELH = 0;
-  C1ON_bit = 0;                                    // Disable comparators
-  C2ON_bit = 0;
+  //C1ON_bit = 0;                            // Disable comparators
+  //C2ON_bit = 0;
 
   Glcd_Init();
 
@@ -132,9 +156,24 @@ void main() {
   //Delay_ms(1);
   
   for (i = 0; i < 8; ++i) {
-    for (j = 0; j < 8; ++j) {
-      //maze[i][j] = rand();
+    for (j = 0; j < 16; ++j) {
+      //printCellAt(i,j, 1);
     }
   }
+
   printMaze();
+  i = 0;
+  j = 7;
+  cell = printCellAt(i, j, 1);
+  while (i != 7 || j != 7) {
+    unsigned char keyp = 0;
+    do {
+      keyp = Keypad_Key_Press();
+    } while (keyp == 0);
+    if (keyp == 1 && DOLU(cell) == 0) {
+      printCellAt(i,j, 0);
+      ++i;
+      cell = printCellAt(i,j, 1);
+    }
+  }
 }
