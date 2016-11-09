@@ -145,21 +145,10 @@ unsigned char printCellAt(unsigned char i, unsigned char j, unsigned char igrac)
 void main() {
   unsigned i, j, i2, j2, cell;
   Keypad_Init();
-  ANSEL  = 0;                              // Configure AN pins as digital
+  ANSEL  = 0; // Configure AN pins as digital
   ANSELH = 0;
-  //C1ON_bit = 0;                            // Disable comparators
-  //C2ON_bit = 0;
 
   Glcd_Init();
-
-  //Glcd_Fill(0x00); //Fill GLCD
-  //Delay_ms(1);
-  
-  for (i = 0; i < 8; ++i) {
-    for (j = 0; j < 16; ++j) {
-      //printCellAt(i,j, 1);
-    }
-  }
 
   printMaze();
   i = 0;
@@ -191,4 +180,5 @@ void main() {
       cell = printCellAt(i,j, 1);
     }
   }
+  Glcd_Write_Text("POBEDA!", 8, 7, 1);
 }
